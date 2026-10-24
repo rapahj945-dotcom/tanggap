@@ -21,6 +21,17 @@ Open http://localhost:3000. On first start the app creates the tables and loads 
 
 **Delete or change these accounts before going public** (Pengguna → Administrator), and set `TAMPILKAN_AKUN_CONTOH=false`.
 
+## Run on Termux (Android)
+
+No Docker in Termux; PostgreSQL runs natively. Everything is automated by one script:
+
+```bash
+pkg install bash -y
+bash scripts/termux.sh
+```
+
+The script (idempotent, safe to re-run) installs nodejs-lts and postgresql, initializes the Postgres cluster at `$PREFIX/var/lib/postgres` (only once), starts it, creates the `tanggap` database, runs `npm install`, and starts the dev server. Open http://localhost:3000 — the schema and sample data are created automatically on first request. For later sessions, start Postgres again with `pg_ctl -D $PREFIX/var/lib/postgres start` (or just re-run the script).
+
 ## Run locally (without Docker for the app)
 
 ```bash
