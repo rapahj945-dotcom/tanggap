@@ -5,11 +5,11 @@
   let { data, children } = $props();
 
   const menu = $derived(
-    data.user.role === 'warga'
-      ? [['/app', 'Ringkasan'], ['/app/laporan', 'Laporan saya'], ['/app/laporan/baru', 'Buat laporan']]
+      data.user.role === 'warga'
+      ? [['/app', 'Ringkasan'], ['/app/laporan', 'Laporan saya'], ['/app/laporan/baru', 'Buat laporan'], ['/app/notifikasi', 'Notifikasi']]
       : data.user.role === 'petugas'
-        ? [['/app', 'Ringkasan'], ['/app/laporan', 'Tugas saya'], ['/app/peta', 'Peta tugas']]
-        : [['/app', 'Ringkasan'], ['/app/laporan', 'Semua laporan'], ['/app/peta', 'Peta sebaran'], ['/app/pengguna', 'Pengguna'], ['/app/master', 'Data master']]
+        ? [['/app', 'Ringkasan'], ['/app/laporan', 'Tugas saya'], ['/app/peta', 'Peta tugas'], ['/app/notifikasi', 'Notifikasi']]
+        : [['/app', 'Ringkasan'], ['/app/laporan', 'Semua laporan'], ['/app/peta', 'Peta sebaran'], ['/app/pengguna', 'Pengguna'], ['/app/master', 'Data master'], ['/app/notifikasi', 'Notifikasi']]
   );
   const aktif = (h: string) => (h === '/app' ? page.url.pathname === '/app' : page.url.pathname.startsWith(h) && !(h === '/app/laporan' && page.url.pathname === '/app/laporan/baru'));
 </script>
@@ -19,7 +19,7 @@
     <Merek />
     <nav aria-label="Menu utama">
       {#each menu as [href, label]}
-        <a {href} aria-current={aktif(href) ? 'page' : undefined}>{label}</a>
+        <a {href} aria-current={aktif(href) ? 'page' : undefined}>{label}{#if href === '/app/notifikasi' && data.notifBaru}<b class="lonceng" title="{data.notifBaru} belum dibaca">{data.notifBaru}</b>{/if}</a>
       {/each}
     </nav>
     <div class="akun">
@@ -38,6 +38,7 @@
   nav a { text-decoration: none; padding: 0.55rem 0.75rem; margin: 0 -0.75rem; font-weight: 600; border-left: 5px solid transparent; }
   nav a:hover { background: var(--kapur-dalam); }
   nav a[aria-current='page'] { border-left-color: var(--rambu); background: var(--kapur-dalam); }
+  .lonceng { margin-left: 0.4rem; background: var(--siaga); color: #fff; border-radius: 999px; font: 700 0.7rem/1 var(--isi); padding: 0.25rem 0.5rem; }
   .akun { margin-top: auto; display: grid; gap: 0.75rem; font-size: var(--skala-1); }
   .akun span { color: var(--senyap); }
   main { padding: clamp(1.25rem, 3vw, 3rem); min-width: 0; max-width: 84rem; width: 100%; }

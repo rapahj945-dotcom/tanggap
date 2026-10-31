@@ -16,7 +16,8 @@ export const load = async ({ locals }) => {
   admin(locals);
   return {
     kategori: await q(`SELECT k.id,k.nama,k.deskripsi,k.warna,(SELECT count(*)::int FROM laporan l WHERE l.kategori_id=k.id) AS dipakai FROM kategori k ORDER BY k.nama`),
-    kecamatan: await q(`SELECT id,nama FROM kecamatan ORDER BY nama`),
+    kota: await q(`SELECT k.id,k.nama,(SELECT count(*)::int FROM kecamatan kc WHERE kc.kota_id=k.id) AS jumlah FROM kota k ORDER BY k.nama`),
+    kecamatan: await q(`SELECT id,kota_id,nama FROM kecamatan ORDER BY nama`),
     desa: await q(`SELECT id,kecamatan_id,nama FROM desa ORDER BY nama`)
   };
 };
@@ -36,11 +37,24 @@ export const actions = {
     const id = Number((await request.formData()).get('id'));
     return coba(() => q('DELETE FROM kategori WHERE id=$1', [id]), 'Jenis masalah dihapus.');
   },
-  tambahKecamatan: async ({ request, locals }) => {
+  tambahKota: async ({ request, locals }) => {
     admin(locals);
     const nama = String((await request.formData()).get('nama') ?? '').trim();
-    if (!nama) return fail(400, { galat: 'Nama kecamatan wajib diisi.' });
-    return coba(() => q('INSERT INTO kecamatan (nama) VALUES ($1)', [nama]), 'Kecamatan ditambahkan.');
+    if (!nama) return fail(400, { galat: 'Nama kota wajib diisi.' });
+    return coba(() => q('INSERT INTO kota (nama) VALUES ($1)', [nama]), 'Kota ditambahkan.');
+  },
+  hapusKota: async ({ request, locals }) => {
+    admin(locals);
+    const id = Number((await request.formData()).get('id'));
+    return coba(() => q('DELETE FROM kota WHERE id=$1 AND NOT EXISTS (SELECT 1 FROM kecamatan WHERE kota_id=$1)', [id]), 'Kota dihapus.');
+  },
+  tambahKecamatan: async ({ request, locals }) => {
+    admin(locals);
+    const f = await request.formData();
+    const nama = String(f.get('nama') ?? '').trim();
+    const kota = Number(f.get('kota_id'));
+    if (!nama || !kota) return fail(400, { galat: 'Pilih kota dan isi nama kecamatan.' });
+    return coba(() => q('INSERT INTO kecamatan (nama,kota_id) VALUES ($1,$2)', [nama, kota]), 'Kecamatan ditambahkan.');
   },
   hapusKecamatan: async ({ request, locals }) => {
     admin(locals);

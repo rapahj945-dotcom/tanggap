@@ -2,6 +2,7 @@ import { error, fail, redirect } from '@sveltejs/kit';
 import { q, one, pool } from '$lib/server/db';
 import { STATUS } from '$lib/server/laporan';
 import { simpanFoto } from '$lib/server/upload';
+import { beritahu } from '$lib/server/beritahu';
 
 async function muat(id: number, u: { id: number; role: string }) {
   const l = await one(
@@ -65,7 +66,13 @@ export const actions = {
       );
       const adaPerubahan = status !== l.status || catatan || petugasId !== l.petugas_id;
       if (adaPerubahan) {
-        await klien.query('INSERT INTO riwayat (laporan_id,status,catatan,oleh,peran) VALUES ($1,$2,$3,$4,$5)', [l.id, status, catatan, u.nama, u.role]);
+        await klien.query('INSERT INTO riwayat (laporan_id,status,catatan,oleh,oleh_id,peran) VALUES ($1,$2,$3,$4,$6,$5)', [l.id, status, catatan, u.nama, u.role, u.id]);
+        if (status !== l.status) {
+          await beritahu(klien as never, l.pelapor_id !== u.id ? l.pelapor_id : null, l.id, `Status laporan "${l.judul}" kini ${status}.`, `/app/laporan/${l.id}`);
+          if (petugasId && petugasId !== l.petugas_id) {
+            await beritahu(klien as never, petugasId, l.id, `Anda ditugaskan menangani "${l.judul}".`, `/app/laporan/${l.id}`);
+          }
+        }
       }
       await klien.query('COMMIT');
     } catch (e) {
