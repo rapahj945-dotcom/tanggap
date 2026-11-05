@@ -29,8 +29,8 @@
     (async () => {
       L = (await import('leaflet')).default;
       if (hapus) return;
-      const pusat: [number, number] = lat != null && lng != null ? [lat, lng] : titik.length ? [titik[0].lat, titik[0].lng] : [-8.46, 118.727];
-      peta = L.map(el, { zoomControl: true, attributionControl: true }).setView(pusat, 13);
+      const pusat: [number, number] = lat != null && lng != null ? [lat, lng] : titik.length ? [titik[0].lat, titik[0].lng] : [-6.21, 106.8457];
+      peta = L.map(el, { zoomControl: true, attributionControl: true }).setView(pusat, 11);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '© OpenStreetMap'
