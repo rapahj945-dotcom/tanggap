@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>TANGGAP — Mockup UI</title>
+<style>
+  :root{
+    --hijau:#1a7a4a; --hijau-tua:#0e5c36; --kuning:#f5b301; --merah:#c0392b;
+    --tinta:#22262a; --abu:#6d757c; --garis:#d9dde0; --kertas:#f7f5f0;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Arial,Helvetica,sans-serif;background:#e9e7e1;color:var(--tinta);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .hlm{width:297mm;min-height:209mm;page-break-after:always;padding:14mm;background:#e9e7e1;position:relative}
+  .judul-besar{font-size:30px;font-weight:800;letter-spacing:1px;color:var(--hijau-tua)}
+  .sub{color:var(--abu);font-size:12px;margin-top:4px}
+  .garis-pemisah{border-top:2px dashed var(--hijau);margin:10px 0}
+  p.ket{font-size:12px;color:var(--abu);max-width:250mm;margin-bottom:8mm}
+  /* ---------- baris perangkat ---------- */
+  .baris{display:flex;flex-wrap:wrap;gap:12mm}
+  .pel {position:relative}
+  /* ---------- telepon ---------- */
+  .telepon{width:78mm;height:160mm;border:2.5mm solid #2b2f33;border-radius:12mm;background:#fff;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+  .poncok{background:var(--hijau);color:#fff;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:11px}
+  .poncok .kecil{font-weight:400;font-size:9px;opacity:.85}
+  .isi{flex:1;padding:10px 10px 0;overflow:hidden;font-size:9.5px}
+  .kaki{padding:6px 10px 10px}
+  .kapsul,.tombol{display:block;border-radius:999px;text-align:center;padding:8px;font-weight:700;font-size:10px;border:none}
+  .tombol{background:var(--hijau);color:#fff}
+  .tombol.kuning{background:var(--kuning);color:#222}
+  .tombol.garis{background:#fff;color:var(--hijau-tua);border:1.5px solid var(--hijau)}
+  label{display:block;font-weight:700;font-size:9px;margin:7px 0 3px;color:var(--hijau-tua)}
+  input,select,textarea{width:100%;border:1px solid var(--garis);border-radius:8px;padding:6px;font-size:9px;background:#fcfcfb}
+  /* ---------- potongan kartu ---------- */
+  .kartu{border:1px solid var(--garis);border-radius:10px;padding:8px 9px;margin-bottom:7px;background:#fff}
+  .kartu b{font-size:10px}
+  .kecil-abu{font-size:8.5px;color:var(--abu)}
+  .lajur{display:inline-block;padding:2px 8px;border-radius:999px;font-size:8px;font-weight:700;color:#fff}
+  .l1{background:#7f8c8d}.l2{background:#2980b9}.l3{background:#8e44ad}.l4{background:#e67e22}.l5{background:#c0392b}.l6{background:#27ae60}.l7{background:#e74c3c}
+  .angka-strip{display:flex;gap:5px;margin:8px 0}
+  .angka-strip div{flex:1;border-left:3px solid var(--hijau);padding:4px 5px;background:#fff;border-radius:0 8px 8px 0}
+  .angka-strip b{display:block;font-size:14px}
+  .angka-strip span{font-size:7.5px;color:var(--abu)}
+  .karyawan-bar{height:6px;background:#e8e6e1;border-radius:4px;margin:3px 0 6px}
+  .karyawan-bar i{display:block;height:100%;background:var(--hijau);border-radius:4px}
+  .kolom-tiga{display:flex;gap:6px}
+  .kolom-tiga .kartu{flex:1;margin:0}
+  .menu-samping{position:absolute;right:3mm;width:36mm}
+  .batang-graf{display:flex;align-items:flex-end;gap:4px;height:26mm;padding:4px;border:1px solid var(--garis);border-radius:10px;background:#fff}
+  .batang-graf i{flex:1;background:var(--hijau);border-radius:3px 3px 0 0;display:block}
+  /* peta tiruan */
+  .peta{height:34mm;border:1px solid var(--garis);border-radius:10px;background:
+    repeating-linear-gradient(0deg,#dfeedd 0 6mm,#e7f2e2 6mm 12mm),
+    repeating-linear-gradient(90deg,#eef2ec 0 8mm,#e3ecdf 8mm 16mm);position:relative;background-color:#e7f2e2}
+  .peta b.pin{position:absolute;width:10px;height:10px;background:#c0392b;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:1px solid #fff}
+  .langkah{border-left:2px solid var(--hijau);margin-left:5px;padding-left:9px}
+  .langkah p{margin-bottom:7px}
+  .titik{position:absolute;left:-13px;top:0;width:8px;height:8px;border-radius:50%;background:var(--hijau)}
+  .langkah{position:relative}
+</style>
+</head>
+<body>
+
+<!-- ================= HALAMAN 1 : SAMPUL + BERANDA ================= -->
+<div class="hlm">
+  <div class="judul-besar">TANGGAP</div>
+  <div class="sub">Platform pengaduan masyarakat — kerusakan jalan, penerangan jalan, tumpukan sampah, banjir. <b>Mockup UI v1</b> · 01 Nov 2026</div>
+  <div class="garis-pemisah"></div>
+  <p class="ket">Desain mengikuti identitas visual aplikasi: gaya <i>ledger</i> (satu judul besar, strip angka, antrean kerja, dan lajur keterangan yang dipisahkan garis putus-putus), tanpa komponen kartu grid. Palet: hijau utama #1a7a4a, aksen kuning #f5b301.</p>
+
+  <div class="baris">
+    <div class="pel">
+      <div class="telepon">
+        <div class="poncok"><span>TANGGAP</span><span class="kecil">Lapor. Lacak. Selesai.</span></div>
+        <div class="isi">
+          <div style="text-align:center;margin:10px 0 12px">
+            <div style="width:30mm;height:30mm;border-radius:50%;background:var(--hijau);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;margin:0 auto">TG</div>
+            <div style="font-weight:800;margin-top:8px">Sampaikan aduanmu,<br>kami bakal tanggap.</div>
+            <div class="kecil-abu;margin-top:4px" style="font-size:8.5px;color:var(--abu);margin-top:4px">Jalan rusak · Penerangan · Sampah · Banjir</div>
+          </div>
+          <span class="tombol">Buat laporan baru</span>
+          <span class="tombol garis" style="margin-top:6px">Lacak laporan</span>
+          <div class="garis-pemisah" style="border-color:var(--garis);margin:10px 0"></div>
+          <div class="angka-strip">
+            <div><b>1.284</b><span>total aduan</span></div>
+            <div><b>312</b><span>dalam proses</span></div>
+            <div><b>92%</b><span>SLA 14 hari</span></div>
+          </div>
+          <div style="border-top:2px dashed var(--garis);padding-top:7px">
+            <div style="font-weight:700;font-size:9px;margin-bottom:4px">Lajur kategori</div>
+            <div class="kecil-abu">Jalan berlubang 41% · Lampu padam 27% · Sampah 18% · Banjir 14%</div>
+          </div>
+        </div>
+        <div class="kaki"><span class="tombol kuning">Masuk warga / petugas</span></div>
+      </div>
+      <div style="text-align:center;font-weight:700;margin-top:5px;font-size:10px">01 · Beranda publik</div>
+    </div>
+
+    <div class="pel">
+      <div class="telepon">
+        <div class="poncok"><span>← Laporan baru</span><span class="kecil">langkah 1/3</span></div>
+        <div class="isi">
+          <label>Kategori</label>
+          <select><option>Jalan rusak / berlubang</option></select>
+          <label>Judul aduan</label>
+          <input value="Jalan berlubang di Jl. Merdeka km 2">
+          <label>Keterangan</label>
+          <textarea rows="4">Lubang setengah meter dari roda ke roda, sudah dua minggu, sering nyaris kecelakaan motor…</textarea>
+          <label>Foto</label>
+          <div style="border:1.5px dashed var(--hijau);border-radius:10px;padding:10px;text-align:center;color:var(--hijau-tua);font-size:8.5px">[ ikon kamera ] Ikat foto (JPG/PNG/WebP, maks 5 MB)</div>
+          <div class="kecil-abu" style="margin-top:5px">JPG_TERPILIH: <b>IMG_2431.jpg</b> · 1,9 MB · valid</div>
+        </div>
+        <div class="kaki"><span class="tombol">Lanjut: tempel pin peta</span></div>
+      </div>
+      <div style="text-align:center;font-weight:700;margin-top:5px;font-size:10px">02 · Form aduan (bag. 1)</div>
+    </div>
+
+    <div class="pel">
+      <div class="telepon">
+        <div class="poncok"><span>← Laporan baru</span><span class="kecil">langkah 2/3</span></div>
+        <div class="isi">
+          <label>Tempel pin lokasi</label>
+          <div class="peta">
+            <b class="pin" style="left:58%;top:44%"></b><b class="pin" style="left:30%;top:62%;background:#1a7a4a"></b>
+            <b class="pin" style="left:75%;top:25%;background:#f5b301"></b>
+          </div>
+          <div class="kecil-abu" style="margin:4px 0 0">Pin: -6,87912 · 109,14033 · tampilkan alamat manual di bawah</div>
+          <label>Lengkai alamat</label>
+          <input value="Sekat Warkop Kopi Tiam, sisi timur, Jl. Merdeka, Kec. Kudu">
+          <label>Tenggat jadwal harapan</label>
+          <input value="14 hari dari sekarang (SLA — sisa 14 hari)">
+          <div class="kartu" style="margin-top:8px;background:#fdf6e3;border-color:#f5b301">
+            <b style="font-size:8.5px">Batas laju</b>
+            <div class="kecil-abu">Aduan hari ini 1 dari 5 per pengguna — sisanya 4 laporan.</div>
+          </div>
+        </div>
+        <div class="kaki"><span class="tombol">Kirim aduan</span></div>
+      </div>
+      <div style="text-align:center;font-weight:700;margin-top:5px;font-size:10px">03 · Form aduan (bag. 2) — pin peta</div>
+    </div>
+
+    <div class="pel">
+      <div class="telepon">
+        <div class="poncok"><span>← Laporan baru</span><span class="kecil">selesai</span></div>
+        <div class="isi" style="text-align:center">
+          <div style="width:22mm;height:22mm;border-radius:50%;background:var(--hijau);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;margin:14px auto 10px">OK</div>
+          <div style="font-weight:800">Aduan tercatat!</div>
+          <div class="kecil-abu" style="margin:4px 0 8px">Simpan kode berikut untuk melacak</div>
+          <div style="border:1.5px dashed var(--hijau);border-radius:10px;padding:10px 6px;background:#f4faf4">
+            <div style="font-size:7.5px;color:var(--abu)">KODE TIKET</div>
+            <div style="font-size:14px;font-weight:800;letter-spacing:1.5px">TG-2026-7F3K</div>
+          </div>
+          <div style="border-top:2px dashed var(--garis);margin:10px 6px 8px"></div>
+          <div style="font-weight:700;font-size:9px;text-align:left;margin-bottom:4px">Yang terjadi selanjutnya</div>
+          <div class="langkah" style="text-align:left">
+            <p><span class="titik"></span><b style="font-size:8.5px">Diverifikasi</b> — admin meninjau ≤ 2 hari</p>
+            <p><span class="titik" style="background:#f5b301"></span><b style="font-size:8.5px">Ditangani petugas</b> — kamu akan menerima notifikasi</p>
+            <p><span class="titik" style="background:#27ae60"></span><b style="font-size:8.5px">Selesai</b> — ada foto sesudah &amp; dana tercatat</p>
+          </div>
+        </div>
+        <div class="kaki"><span class="tombol">Lacak sekarang</span><span class="tombol garis" style="margin-top:6px">Kembali ke beranda</span></div>
+      </div>
+      <div style="text-align:center;font-weight:700;margin-top:5px;font-size:10px">04 · Sukses kirim + kode tiket</div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= HALAMAN 2 : LACAK + DETAIL ================= -->
+<div class="hlm">
+  <div class="judul-besar">TANGGAP · LACAK PUBLIK</div>
+  <div class="sub">/lacak/TG-2026-7F3K — tidak perlu masuk, status penuh, riwayat, dan dana tampak untuk semua</div>
+  <div class="garis-pemisah"></div>
+
+  <div class="baris">
+    <div class="pel">
+      <div class="telepon">
+        <div class="poncok"><span>TANGGAP</span><span class="kecil">lacak</span></div>
+        <div class="isi" style="text-align:center;padding-top:16px">
+          <label style="text-align:left">Kode tiket</label>
+          <input value="TG-2026-7F3K" style="letter-spacing:2px;font-weight:700;text-align:center">
+          <span class="tombol" style="margin-top:10px">Buka riwayat</span>
+          <div class="kartu" style="margin-top:12px;text-align:left">
+            <b>Jalan berlubang di Jl. Merdeka km 2</b>
+            <div class="kecil-abu">TG-2026-7F3K · Jalan rusak · Kec. Kudu</div>
+            <div style="margin-top:5px"><span class="lajur l4">Perbaikan</span> <span class="lajur l2" style="background:#e67e22">SLA sisa 6 hari</span></div>
+          </div>
+          <div class="kecil-abu" style="margin-top:8px">Dan unggah bukti / nilai — hanya pelapor yang bisa dinilai setelah selesai</div>
+        </div>
+        <div class="kaki"><span class="tombol garis">Beranda</span></div>
+      </div>
+      <div style="text-align:center;font-weight:700;margin-top:5px;font-size:10px">05 · Cari tiket (tanpa login)</div>
+    </div>
+
+    <div class="pel">
+      <div class="telepon">
+        <div class="poncok"><span>← TG-2026-7F3K</span><span class="kecil">riwayat</span></div>
+        <div class="isi">
+          <div class="kartu" style="margin-top:0">
+            <b>Jalan berlubang di Jl. Merdeka km 2</b>
+            <div class="kecil-abu">Dibuat 20 Okt 2026 · oleh warga S.</div>
+            <div style="margin-top:5px"><span class="lajur l4">Perbaikan</span> <span style="font-size:8px;color:#e67e22;font-weight:700">sisa 6 hari dari 14</span></div>
+          </div>
+          <div class="batang-graf" style="height:22mm">progres-tiruan</div>
+          <div class="angka-strip">
+            <div><b>Rp 12,5 jt</b><span>anggaran tercatat</span></div>
+            <div><b>2</b><span>foto berkala</span></div>
+          </div>
+          <div style="border-top:2px dashed var(--garis);padding-top:6px">
+            <div style="font-weight:700;font-size:9px;margin-bottom:5px">Riwayat lengkap (semua dicatat oleh pembuat perubahan)</div>
+            <div class="langkah" style="font-size:8.5px">
+              <p><span class="titik"></span><b>Diterima</b> · sistem · 20 Okt</p>
+              <p><span class="titik" style="background:#2980b9"></span><b>Diverifikasi</b> · oleh admin@… · 21 Okt</p>
+              <p><span class="titik" style="background:#8e44ad"></span><b>Ditangani</b> · oleh ahmad@… · 23 Okt</p>
+              <p><span class="titik" style="background:#e67e22"></span><b>Survei</b> · oleh ahmad@… · 27 Okt</p>
+              <p><span class="titik" style="background:#c0392b"></span><b>Perbaikan</b> · oleh ahmad@… · 29 Okt</p>
+            </div>
+          </div>
+        </div>
+        <div class="kaki"><span class="tombol kuning">Beri penilaian (setelah selesai)</span></div>
+      </div>
+      <div style="text-align:center;font-weight:700;margin-top:5px;font-size:10px">06 · Detail + riwayat + SLA</div>
+    </div>
+
+    <div class="pel">
+      <div class="telepon">
+        <div class="poncok"><span>TANGGAP</span><span class="kecil">masuk</span></div>
+        <div class="isi" style="padding-top:14px">
+          <div style="font-weight:800;font-size:12px">Masuk</div>
+          <div class="kecil-abu" style="margin-bottom:8px">Warga, petugas lapangan, atau administrator</div>
+          <label>Email</label>
+          <input value="siti@contoh.id">
+          <label>Sandi</label>
+          <input type="password" value="••••••••">
+          <span class="tombol" style="margin-top:12px">Masuk</span>
+          <div class="kecil-abu" style="text-align:center;margin-top:8px">Belum berrekening? <b>Daftar</b> — 3 pendaftaran per jam</div>
+          <div class="kartu" style="margin-top:10px;background:#fdf6e3;border-color:#f5b301">
+            <b style="font-size:8.5px">Batas laju aktif</b>
+            <div class="kecil-abu">Sisa 4 dari 5 percobaan masuk dalam 10 menit untuk jaringan ini.</div>
+          </div>
+          <div style="border-top:2px dashed var(--garis);margin:10px 0 0;padding-top:7px">
+            <div class="kecil-abu">Sesi disimpan sebagai kuki httpOnly &amp; sesi PostgreSQL.</div>
+          </div>
+        </div>
+        <div class="kaki"><span class="tombol garis">Lanjut tanpa masuk → lacak</span></div>
+      </div>
+      <div style="text-align:center;font-weight:700;margin-top:5px;font-size:10px">07 · Masuk</div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= HALAMAN 3 : DASBOR PETUGAS ================= -->
+<div class="hlm">
+  <div class="judul-besar">TANGGAP · DASBOR APLIKASI</div>
+  <div class="sub">/app — gaya lajur: satu judul, strip angka, antrean kerja, dan rel samping; warga &amp; petugas &amp; admin punya cakupan berbeda</div>
+  <div class="garis-pemisah"></div>
+
+  <div class="baris">
+    <div class="pel">
+      <div class="telepon">
+        <div class="poncok"><span>TANGGAP</span><span class="kecil">ahmad@·petugas</span></div>
+        <div class="isi">
+          <div style="font-weight:800;font-size:13px">Antrean kerja hari ini</div>
+          <div class="kecil-abu">Selasa, 1 Nov 2026</div>
+          <div class="angka-strip">
+            <div><b>14</b><span>tugas saya</span></div>
+            <div><b>5</b><span>perlu ditangani</span></div>
+            <div><b>2</b><span>SLA ≤2 hari (merah)</span></div>
+          </div>
+          <div class="kartu">
+            <b>Lampu jalan padam, blok C</b>
+            <div class="kecil-abu">TG-2026-9A1B · Survei</div>
+            <div style="margin-top:4px"><span class="lajur l5" style="background:#e67e22">SLA sisa 2 hari</span> <span class="lajur l3">Survei</span></div>
+            <div class="kecil-abu" style="margin-top:4px">Bukit Indah · percobaan ke-2</div>
+          </div>
+          <div class="kartu">
+            <b>Sampah numpuk di pasar</b>
+            <div class="kecil-abu">TG-2026-4B8D · Ditangani</div>
+            <div style="margin-top:4px"><span class="lajur l2" style="background:#e67e22">SLA sisa 5 hari</span> <span class="lajur l3">Ditangani</span></div>
+          </div>
+          <div class="kartu">
+            <b>Jalan bergelombang</b>
+            <div class="kecil-abu">TG-2026-7F3K · Perbaikan</div>
+            <div style="margin-top:4px"><span class="lajur l6" style="background:#27ae60">SLA sisa 6 hari</span> <span class="lajur l4">Perbaikan</span></div>
+          </div>
+        </div>
+        <div class="kaki">
+          <span class="tombol">Ambil tugas teratas</span>
+        </div>
+      </div>
+      <div style="text-align:center;font-weight:700;margin-top:5px;font-size:10px">08 · Dasbor petugas</div>
+    </div>
+
+    <div class="pel">
+      <div class="telepon">
+        <div class="poncok"><span>← TG-2026-9A1B</span><span class="kecil">keputusan</span></div>
+        <div class="isi">
+          <div class="kartu" style="margin-top:0">
+            <b>Lampu jalan padam, blok C</b>
+            <div class="kecil-abu">Warga tertentu · Bukit Indah, Kec. Kudu</div>
+            <div style="margin-top:4px"><span class="lajur l5" style="background:#e67e22">SLA sisa 2 hari</span></div>
+          </div>
+          <label>Tindakan (alur status: Diterima → Diverifikasi → Ditangani → Survei → Perbaikan → Selesai / Ditolak)</label>
+          <div class="kolom-tiga" style="margin-top:2px">
+            <div class="kartu" style="text-align:center"><b style="font-size:9px">Survei</b><div class="kecil-abu">sekarang</div></div>
+            <div class="kartu" style="text-align:center;border-color:var(--hijau)"><b style="font-size:9px;color:var(--hijau)">Perbaikan</b><div class="kecil-abu">alur pilih</div></div>
+            <div class="kartu" style="text-align:center"><b style="font-size:9px">Selesai</b><div class="kecil-abu">butuh bukti</div></div>
+          </div>
+          <label>Catatan riwayat (tercatat oleh_id)</label>
+          <textarea rows="3">Pemindahan lampu LC-304; 12 poin penggantian; berlangsungan uang reses di cek.</textarea>
+          <label>Dana &amp; foto sesudah (wajib saat Selesai)</label>
+          <div class="kolom-tiga">
+            <input value="Rp 2.750.000"><div style="border:1.5px dashed var(--hijau);border-radius:8px;text-align:center;color:var(--hijau-tua);font-size:8px;padding:6px 2px">[ kamera ]</div>
+          </div>
+        </div>
+        <div class="kaki"><span class="tombol">Simpan perubahan status</span></div>
+      </div>
+      <div style="text-align:center;font-weight:700;margin-top:5px;font-size:10px">09 · Tindakan petugas + dana + foto sesudah</div>
+    </div>
+
+    <div class="pel">
+      <div class="telepon">
+        <div class="poncok"><span>TANGGAP</span><span class="kecil">admin@·administrator</span></div>
+        <div class="isi">
+          <div style="font-weight:800;font-size:13px">Dasbor administrasi</div>
+          <div class="angka-strip">
+            <div><b>1.284</b><span>total aduan</span></div>
+            <div><b>312</b><span>terbuka</span></div>
+            <div><b>94%</b><span>SLA tepat</span></div>
+            <div><b>7</b><span>petugas aktif</span></div>
+          </div>
+          <div class="batang-graf">
+            <i style="height:35%"></i><i style="height:55%"></i><i style="height:40%"></i><i style="height:70%"></i><i style="height:60%"></i><i style="height:85%;background:#f5b301"></i><i style="height:100%"></i>
+          </div>
+          <div class="kecil-abu" style="margin:3px 0 6px">Aduan naik (7 hari terakhir)</div>
+          <div class="kartu">
+            <b>Pengguna &amp; peran</b>
+            <div class="kecil-abu">12 warga · 7 petugas · 2 admin — peran dijalankan ulang di server setiap muat</div>
+          </div>
+          <div class="kartu">
+            <b>Peta kecamatan</b>
+            <div class="kecil-abu">hubungan kecamatan diperbaiki pada saringan peta</div>
+          </div>
+          <div class="kartu">
+            <b>Notifikasi</b>
+            <div class="kecil-abu">satu titik merah di bilah samping menampilkan penghitung belum dibaca</div>
+          </div>
+        </div>
+        <div class="kaki" style="display:flex;gap:5px">
+          <span class="tombol kuning" style="flex:1">Ekspor CSV</span><span class="tombol garis" style="flex:1">Ekspor Excel</span>
+        </div>
+      </div>
+      <div style="text-align:center;font-weight:700;margin-top:5px;font-size:10px">10 · Dasbor administrator</div>
+    </div>
+
+    <div class="pel">
+      <div class="telepon">
+        <div class="poncok"><span>TANGGAP</span><span class="kecil">notifikasi · 3 baru</span></div>
+        <div class="isi">
+          <div style="font-weight:800;font-size:12px">Notifikasi</div>
+          <div class="kecil-abu" style="margin-bottom:6px">Reportermu diberitahu setiap kali status berubah atau petugas ditugaskan</div>
+          <div class="kartu" style="border-left:3px solid var(--hijau)">
+            <b>Situs tiket TG-2026-7F3K</b>
+            <div class="kecil-abu">Status jadi <b>Perbaikan</b> oleh ahmad@tanggap.id · 10 mnt lalu</div>
+          </div>
+          <div class="kartu" style="border-left:3px solid var(--hijau)">
+            <b>Petugas ditugaskan</b>
+            <div class="kecil-abu">ahmad@ ditugaskan pada Tiket TG-2026-3E9Q · 2 jam lalu</div>
+          </div>
+          <div class="kartu" style="border-left:3px solid var(--hijau)">
+            <b>Tiket TG-2026-1C2M</b>
+            <div class="kecil-abu">Status jadi <b>Selesai</b> · silakan beri nilai · kemarin</div>
+          </div>
+          <div class="kartu" style="opacity:.55">
+            <b>Tiket TG-2026-8K5T</b>
+            <div class="kecil-abu">Status jadi <b>Diverifikasi</b> · 3 hari lalu · sudah dibaca</div>
+          </div>
+        </div>
+        <div class="kaki" style="display:flex;gap:5px">
+          <span class="tombol kuning" style="flex:2">Tandai semua dibaca</span><span class="tombol garis" style="flex:1">Hapus satu</span>
+        </div>
+      </div>
+      <div style="text-align:center;font-weight:700;margin-top:5px;font-size:10px">11 · Notifikasi dalam aplikasi</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
