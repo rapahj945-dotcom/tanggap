@@ -2,7 +2,7 @@
   import Lajur from '$lib/components/Lajur.svelte';
   import Batang from '$lib/components/Batang.svelte';
   import Tren from '$lib/components/Tren.svelte';
-  import { hariLalu, rupiah, rupiahRingkas, WARNA_STATUS } from '$lib/format';
+  import { hariLalu, rupiah, rupiahRingkas, WARNA_STATUS, sla } from '$lib/format';
   let { data } = $props();
 
   const total = $derived(data.mode === 'staf' ? data.perStatus.reduce((a: number, s: any) => a + s.nilai, 0) : 0);
@@ -79,7 +79,7 @@
                   <span class="meta"><span class="num">{l.kode}</span>, {l.kategori}{l.kecamatan ? ', ' + l.kecamatan : ''}{data.peran === 'admin' ? ', ' + (l.petugas ?? 'belum ada petugas') : ''}</span>
                 </td>
                 <td><Lajur status={l.status} /></td>
-                <td class="num umur" class:lama={(Date.now() - new Date(l.created_at).getTime()) / 86400000 > 3}>{hariLalu(l.created_at)}</td>
+                <td class="num umur" class:lama={sla(l.created_at, l.status).sisa <= 5} style:color={sla(l.created_at, l.status).warna}>{sla(l.created_at, l.status).label}</td>
               </tr>
             {/each}
           </tbody>
