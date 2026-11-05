@@ -32,20 +32,28 @@
 
   <section>
     <h2>Wilayah</h2>
-    {#each data.kecamatan as kc}
+    {#each data.kota as kt}
       <div class="kec">
         <div class="kepala-kec">
-          <h3>{kc.nama}</h3>
-          <form method="POST" action="?/hapusKecamatan" use:enhance={hapus(kc.nama)}><input type="hidden" name="id" value={kc.id} /><button class="btn kecil bahaya" aria-label={`Hapus ${kc.nama}`}>Hapus</button></form>
+          <h3>{kt.nama} <span class="meta">({kt.jumlah} kecamatan)</span></h3>
+          {#if kt.jumlah === 0}
+            <form method="POST" action="?/hapusKota" use:enhance={hapus(kt.nama)}><input type="hidden" name="id" value={kt.id} /><button class="btn kecil bahaya" aria-label={`Hapus ${kt.nama}`}>Hapus</button></form>
+          {:else}<span></span>{/if}
         </div>
-        <ul class="desa">
-          {#each data.desa.filter((d: any) => d.kecamatan_id === kc.id) as d}
-            <li>
-              <span>{d.nama}</span>
-              <form method="POST" action="?/hapusDesa" use:enhance={hapus(d.nama)}><input type="hidden" name="id" value={d.id} /><button class="btn kecil bahaya" aria-label={`Hapus ${d.nama}`}>Hapus</button></form>
-            </li>
-          {/each}
-        </ul>
+        {#each data.kecamatan.filter((kc: any) => kc.kota_id === kt.id) as kc}
+          <div class="kepala-kec baris-kec">
+            <h4>{kc.nama}</h4>
+            <form method="POST" action="?/hapusKecamatan" use:enhance={hapus(kc.nama)}><input type="hidden" name="id" value={kc.id} /><button class="btn kecil bahaya" aria-label={`Hapus ${kc.nama}`}>Hapus</button></form>
+          </div>
+          <ul class="desa">
+            {#each data.desa.filter((d: any) => d.kecamatan_id === kc.id) as d}
+              <li>
+                <span>{d.nama}</span>
+                <form method="POST" action="?/hapusDesa" use:enhance={hapus(d.nama)}><input type="hidden" name="id" value={d.id} /><button class="btn kecil bahaya" aria-label={`Hapus ${d.nama}`}>Hapus</button></form>
+              </li>
+            {/each}
+          </ul>
+        {/each}
       </div>
     {/each}
     <form method="POST" action="?/tambahDesa" use:enhance class="isian tambah">
@@ -54,8 +62,13 @@
       <div><button class="btn">Tambah kelurahan/desa</button></div>
     </form>
     <form method="POST" action="?/tambahKecamatan" use:enhance class="isian tambah">
+      <div class="bidang"><label for="kcKota">Kota</label><select id="kcKota" name="kota_id" required><option value="">Pilih</option>{#each data.kota as kt}<option value={kt.id}>{kt.nama}</option>{/each}</select></div>
       <div class="bidang"><label for="kcn">Kecamatan baru</label><input id="kcn" name="nama" required /></div>
       <div><button class="btn">Tambah kecamatan</button></div>
+    </form>
+    <form method="POST" action="?/tambahKota" use:enhance class="isian tambah">
+      <div class="bidang"><label for="ktn">Kota/kabupaten baru</label><input id="ktn" name="nama" required /></div>
+      <div><button class="btn">Tambah kota</button></div>
     </form>
   </section>
 </div>
@@ -67,6 +80,8 @@
   .dua { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1.5rem, 4vw, 4rem); padding-top: 1.5rem; align-items: start; }
   h2 { font-size: var(--skala-4); margin-bottom: 1rem; }
   h3 { font-size: var(--skala-3); }
+  h4 { font-size: var(--skala-2); margin: 0.6rem 0 0; padding-left: 0.4rem; }
+  .baris-kec { padding-bottom: 0.2rem; }
   ul { list-style: none; padding: 0; margin: 0; }
   li { display: grid; grid-template-columns: 0.9rem 1fr auto; gap: 0.9rem; align-items: center; padding: 0.7rem 0; border-bottom: 1px dashed var(--garis); }
   li i { width: 0.9rem; height: 0.9rem; border-radius: 50%; border: 2px solid var(--aspal); display: block; }
