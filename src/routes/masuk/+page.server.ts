@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import { env } from '$env/dynamic/private';
 import { one } from '$lib/server/db';
 import { createSession } from '$lib/server/auth';
+import { bolehMasuk } from '$lib/server/batas';
 
 const aman = (p: string | null) => (p && p.startsWith('/app') && !p.startsWith('//') ? p : '/app');
 
@@ -12,7 +13,8 @@ export const load = ({ locals, url }) => {
 };
 
 export const actions = {
-  default: async ({ request, cookies, url }) => {
+  default: async ({ request, cookies, url, getClientAddress }) => {
+    if (!bolehMasuk(getClientAddress())) return fail(429, { email: '', galat: 'Terlalu banyak percobaan. Tunggu beberapa menit lalu coba lagi.' });
     const f = await request.formData();
     const email = String(f.get('email') ?? '').trim().toLowerCase();
     const sandi = String(f.get('sandi') ?? '');

@@ -2,13 +2,15 @@ import { fail, redirect } from '@sveltejs/kit';
 import bcrypt from 'bcryptjs';
 import { one } from '$lib/server/db';
 import { createSession } from '$lib/server/auth';
+import { bolehDaftar } from '$lib/server/batas';
 
 export const load = ({ locals }) => {
   if (locals.user) redirect(303, '/app');
 };
 
 export const actions = {
-  default: async ({ request, cookies }) => {
+  default: async ({ request, cookies, getClientAddress }) => {
+    if (!bolehDaftar(getClientAddress())) return fail(429, { nama: '', email: '', no_hp: '', galat: 'Terlalu banyak pendaftaran dari jaringan ini. Coba lagi nanti.' });
     const f = await request.formData();
     const nama = String(f.get('nama') ?? '').trim();
     const email = String(f.get('email') ?? '').trim().toLowerCase();
