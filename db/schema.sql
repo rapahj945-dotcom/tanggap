@@ -22,10 +22,17 @@ CREATE TABLE IF NOT EXISTS kategori (
   warna      TEXT NOT NULL DEFAULT '#1B1F23'
 );
 
-CREATE TABLE IF NOT EXISTS kecamatan (
+CREATE TABLE IF NOT EXISTS kota (
   id    SERIAL PRIMARY KEY,
   nama  TEXT NOT NULL UNIQUE
 );
+
+CREATE TABLE IF NOT EXISTS kecamatan (
+  id      SERIAL PRIMARY KEY,
+  nama    TEXT NOT NULL UNIQUE,
+  kota_id INT REFERENCES kota(id)
+);
+ALTER TABLE kecamatan ADD COLUMN IF NOT EXISTS kota_id INT REFERENCES kota(id);
 
 CREATE TABLE IF NOT EXISTS desa (
   id            SERIAL PRIMARY KEY,
@@ -70,6 +77,19 @@ CREATE TABLE IF NOT EXISTS riwayat (
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS riwayat_laporan_idx ON riwayat(laporan_id);
+
+CREATE TABLE IF NOT EXISTS notif (
+  id          SERIAL PRIMARY KEY,
+  user_id     INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  laporan_id  INT REFERENCES laporan(id) ON DELETE CASCADE,
+  teks        TEXT NOT NULL,
+  tautan      TEXT NOT NULL DEFAULT '',
+  dibaca      BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS notif_user_idx ON notif(user_id, dibaca, created_at DESC);
+
+ALTER TABLE riwayat ADD COLUMN IF NOT EXISTS oleh_id INT REFERENCES users(id) ON DELETE SET NULL;
 
 CREATE TABLE IF NOT EXISTS penilaian (
   laporan_id  INT PRIMARY KEY REFERENCES laporan(id) ON DELETE CASCADE,
