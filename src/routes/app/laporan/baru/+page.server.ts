@@ -2,12 +2,15 @@ import { error, fail, redirect } from '@sveltejs/kit';
 import { q, one, pool } from '$lib/server/db';
 import { buatKode } from '$lib/server/laporan';
 import { simpanFoto } from '$lib/server/upload';
+import { bolehLapor } from '$lib/server/batas';
+import { beritahuAdmin } from '$lib/server/beritahu';
 
 export const load = async ({ locals }) => {
   if (locals.user!.role === 'petugas') error(403, 'Petugas tidak membuat laporan');
   return {
     kategori: await q('SELECT id,nama,deskripsi FROM kategori ORDER BY nama'),
-    kecamatan: await q('SELECT id,nama FROM kecamatan ORDER BY nama'),
+    kota: await q('SELECT id,nama FROM kota ORDER BY nama'),
+    kecamatan: await q('SELECT id,kota_id,nama FROM kecamatan ORDER BY nama'),
     desa: await q('SELECT id,kecamatan_id,nama FROM desa ORDER BY nama')
   };
 };
@@ -16,6 +19,7 @@ export const actions = {
   default: async ({ request, locals }) => {
     const u = locals.user!;
     if (u.role === 'petugas') error(403);
+    if (!bolehLapor(u.id)) return fail(429, { judul: '', uraian: '', alamat: '', galat: 'Batas kirim tercapai (5 laporan per hari). Laporkan masalah lain esok hari.' });
     const f = await request.formData();
     const v = {
       judul: String(f.get('judul') ?? '').trim(),
@@ -38,18 +42,29 @@ export const actions = {
     let foto: string | null = null;
     try { foto = await simpanFoto(f.get('foto')); } catch (e) { return fail(400, { ...balik, galat: (e as Error).message }); }
 
-    const kode = await buatKode();
     const klien = await pool.connect();
     let id: number;
     try {
       await klien.query('BEGIN');
-      const r = await klien.query(
-        `INSERT INTO laporan (kode,pelapor_id,kategori_id,kecamatan_id,desa_id,judul,uraian,alamat,lat,lng,foto)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING id`,
-        [kode, u.id, v.kategori_id, v.kecamatan_id, v.desa_id, v.judul, v.uraian, v.alamat, v.lat, v.lng, foto]
-      );
+      let kode = await buatKode();
+      let r: { rows: { id: number }[] };
+      // kodish unik: jika dua laporan bersamaan mendebat nomor sama, coba ulang beberapa kali
+      for (let coba = 1; ; coba++) {
+        try {
+          r = await klien.query(
+            `INSERT INTO laporan (kode,pelapor_id,kategori_id,kecamatan_id,desa_id,judul,uraian,alamat,lat,lng,foto)
+             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING id`,
+            [kode, u.id, v.kategori_id, v.kecamatan_id, v.desa_id, v.judul, v.uraian, v.alamat, v.lat, v.lng, foto]
+          );
+          break;
+        } catch (e: any) {
+          if (e?.code === '23505' && coba < 4) { kode = await buatKode(new Date(Date.now() + coba)); continue; }
+          throw e;
+        }
+      }
       id = r.rows[0].id;
-      await klien.query(`INSERT INTO riwayat (laporan_id,status,catatan,oleh,peran) VALUES ($1,'Diterima','Laporan masuk.',$2,$3)`, [id, u.nama, u.role]);
+      await klien.query(`INSERT INTO riwayat (laporan_id,status,catatan,oleh,oleh_id,peran) VALUES ($1,'Diterima','Laporan masuk.',$2,$3,$4)`, [id, u.nama, u.id, u.role]);
+      await beritahuAdmin(klien, id, `Laporan baru: "${v.judul}" menunggu verifikasi.`, `/app/laporan/${id}`);
       await klien.query('COMMIT');
     } catch (e) {
       await klien.query('ROLLBACK');

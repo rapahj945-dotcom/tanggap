@@ -1,6 +1,6 @@
 <script lang="ts">
   import Lajur from '$lib/components/Lajur.svelte';
-  import { tanggal, rupiah } from '$lib/format';
+  import { tanggal, rupiah, SLA_HARI, sla } from '$lib/format';
   let { data } = $props();
   const judul = $derived(data.user.role === 'warga' ? 'Laporan saya' : data.user.role === 'petugas' ? 'Tugas saya' : 'Semua laporan');
   const tautan = (hal: number) => {
@@ -35,6 +35,10 @@
   <button class="btn">Terapkan</button>
 </form>
 
+{#if data.user.role !== 'warga'}
+  <p class="bantu">SLA: setiap laporan harus selesai dalam {SLA_HARI} hari sejak dibuat.</p>
+{/if}
+
 {#if data.baris.length === 0}
   <p class="kosong">Tidak ada laporan yang cocok. {#if data.user.role === 'warga'}<a href="/app/laporan/baru">Buat laporan baru</a>.{:else}Longgarkan filter di atas.{/if}</p>
 {:else}
@@ -48,7 +52,7 @@
               <a class="judul" href={`/app/laporan/${l.id}`}>{l.judul}</a><br />
               <span class="meta"><i class="titik" style:background={l.warna}></i><span class="num">{l.kode}</span>, {l.kategori}{l.kecamatan ? ', ' + l.kecamatan : ''}</span>
             </td>
-            <td><Lajur status={l.status} /></td>
+            <td><Lajur status={l.status} /><span class="sla num" style:color={sla(l.created_at, l.status).warna}>{sla(l.created_at, l.status).label}</span></td>
             <td class="meta">{l.petugas ?? '–'}</td>
             <td class="num meta">{l.dana ? rupiah(l.dana) : '–'}</td>
             <td class="num meta">{tanggal(l.created_at)}</td>
@@ -76,6 +80,7 @@
   .judul { font-weight: 600; font-size: var(--skala-3); }
   .meta { color: var(--senyap); font-size: var(--skala-1); }
   .titik { display: inline-block; width: 0.6rem; height: 0.6rem; margin-right: 0.45rem; border-radius: 50%; }
+  .sla { display: block; margin-top: 0.3rem; font-size: var(--skala-1); font-weight: 700; }
   .kosong { color: var(--senyap); padding: 2rem 0; }
   .hal { display: flex; gap: 1.5rem; align-items: center; padding: 1.5rem 0; font-weight: 600; }
   .hal span { color: var(--senyap); font-weight: 400; }

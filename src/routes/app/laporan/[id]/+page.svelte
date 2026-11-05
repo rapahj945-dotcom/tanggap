@@ -3,7 +3,7 @@
   import { page } from '$app/state';
   import Lajur from '$lib/components/Lajur.svelte';
   import Peta from '$lib/components/Peta.svelte';
-  import { rupiah, tanggal, tanggalJam, WARNA_STATUS } from '$lib/format';
+  import { rupiah, tanggal, tanggalJam, WARNA_STATUS, SLA_HARI, sla } from '$lib/format';
   let { data, form } = $props();
   const l = $derived(data.l);
   const staf = $derived(data.user.role !== 'warga');
@@ -22,6 +22,7 @@
   <p class="kode num">{l.kode}</p>
   <h1>{l.judul}</h1>
   <Lajur status={l.status} besar />
+  <p class="sla" style:color={sla(l.created_at, l.status).warna}>SLA: {sla(l.created_at, l.status).label} dari {SLA_HARI} hari (hari ke-{sla(l.created_at, l.status).hari + 1})</p>
 </header>
 
 <div class="dua">
@@ -123,6 +124,7 @@
   .kepala { display: grid; gap: 0.9rem; padding-bottom: 1.5rem; max-width: 52rem; }
   .kode { font: 700 var(--skala-3)/1 var(--tampil); color: var(--senyap); }
   h1 { font-size: var(--skala-6); font-weight: 800; font-variation-settings: 'wdth' 88; }
+  .sla { font-weight: 700; font-size: var(--skala-1); margin-top: 0.35rem; }
   h2 { font-size: var(--skala-4); margin: 1.5rem 0 0.75rem; }
   .tindakan h2 { margin-top: 0; font-size: var(--skala-3); }
   .dua { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: clamp(1.5rem, 4vw, 4rem); align-items: start; border-top: 3px solid var(--aspal); padding-top: 1.5rem; }
