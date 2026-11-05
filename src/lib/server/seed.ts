@@ -11,16 +11,43 @@ const KATEGORI = [
   ['Pohon tumbang', 'Pohon miring atau tumbang menutup jalan', '#2E7D6B']
 ];
 
-const WILAYAH: Record<string, string[]> = {
-  'Bima Kota': ['Rabadompu Timur', 'Paruga', 'Kumbe'],
-  'Rasanae Barat': ['Kolo', 'Nae', 'Sarae'],
-  'Rasanae Timur': ['Oi Mbo', 'Lampe', 'Dara']
+// kota -> [kecamatan, [kelurahan/desa]]
+const WILAYAH: Record<string, Record<string, string[]>> = {
+  'DKI Jakarta': {
+    'Menteng': ['Kebon Sirih', 'Kebon Kacang', 'Menteng'],
+    'Tanjung Priok': ['Kepaon', 'Papanggo', 'Tanjung Priok'],
+    'Pasar Minggu': ['Pejaten Barat', 'Ragunan', 'Pasar Minggu'],
+    'Cilincing': ['Sukapura', 'Semper', 'Cilincing']
+  },
+  'Kota Bogor': {
+    'Bogor Tengah': ['Babakan', 'Panaragan', 'Gudang'],
+    'Bogor Utara': ['Tegal Gundul', 'Tanah Sareal', 'Bantar Kemang'],
+    'Cibinong': ['Nanggewer', 'Pakansari', 'Karadenan']
+  },
+  'Kota Depok': {
+    'Cilodong': ['Kalimulya', 'Jatimulya', 'Sukamaju'],
+    'Limo': ['Krukut', 'Grogol', 'Limo'],
+    'Beji': ['Kukusan', 'Beji Timur', 'Tanah Baru']
+  },
+  'Kota Tangerang': {
+    'Ciledug': ['Kresek', 'Parung Serab', 'Cibulang'],
+    'Pinang': ['Kelapa Indah', 'Kali Baru', 'Pinang'],
+    'Tambun Selatan': ['Bojong Mara', 'Jaka Sampurna', 'Tambun Kidul']
+  },
+  'Kota Tangerang Selatan': {
+    'Ciputat': ['Cempaka Putih', 'Sasak', 'Jombang'],
+    'Pamulang': ['Page Baru', 'Pondok Benda', 'Pamulang']
+  },
+  'Kota Bekasi': {
+    'Bekasi Timur': ['Duren Jaya', 'Jatiwaringin', 'Bekasi Jaya'],
+    'Bekasi Selatan': ['Pekayon Jaya', 'Jatirangga', 'Muaragemari']
+  }
 };
 
 const AKUN: [string, string, string, string, string][] = [
-  ['Admin TANGGAP', 'admin@tanggap.id', '0811000001', 'admin', 'admin123'],
-  ['Ahmad Subagja', 'ahmad@tanggap.id', '0811000002', 'petugas', 'petugas123'],
-  ['Deni Kurniawan', 'deni@tanggap.id', '0811000003', 'petugas', 'petugas123'],
+  ['Zaib Akbar Rizkia', 'zainakbarrizkia@gmail.com', '0811000001', 'admin', 'admin123'],
+  ['Iqbal Raihan Raffianza', 'raffianzaiqbal695@gmail.com', '0811000002', 'petugas', 'petugas123'],
+  ['Glorya Maylisa Bacas', 'bacasglorya@gmail.com', '0811000003', 'petugas', 'petugas123'],
   ['Siti Rahmawati', 'siti@contoh.id', '0811000004', 'warga', 'warga123'],
   ['Rizky Pratama', 'rizky@contoh.id', '0811000005', 'warga', 'warga123']
 ];
@@ -37,26 +64,29 @@ export async function seedIfEmpty() {
   for (const [nama, deskripsi, warna] of KATEGORI) {
     await q('INSERT INTO kategori (nama,deskripsi,warna) VALUES ($1,$2,$3)', [nama, deskripsi, warna]);
   }
-  for (const [kec, desa] of Object.entries(WILAYAH)) {
-    const r = await one<{ id: number }>('INSERT INTO kecamatan (nama) VALUES ($1) RETURNING id', [kec]);
-    for (const d of desa) await q('INSERT INTO desa (kecamatan_id,nama) VALUES ($1,$2)', [r!.id, d]);
+  for (const [kota, kecs] of Object.entries(WILAYAH)) {
+    const k = await one<{ id: number }>('INSERT INTO kota (nama) VALUES ($1) RETURNING id', [kota]);
+    for (const [kec, desa] of Object.entries(kecs)) {
+      const r = await one<{ id: number }>('INSERT INTO kecamatan (nama,kota_id) VALUES ($1,$2) RETURNING id', [kec, k!.id]);
+      for (const d of desa) await q('INSERT INTO desa (kecamatan_id,nama) VALUES ($1,$2)', [r!.id, d]);
+    }
   }
 
   const users = await q<{ id: number; email: string; nama: string }>('SELECT id,email,nama FROM users');
   const uid = (e: string) => users.find((u) => u.email === e)!;
   const siti = uid('siti@contoh.id'), rizky = uid('rizky@contoh.id');
-  const ahmad = uid('ahmad@tanggap.id'), deni = uid('deni@tanggap.id');
+  const ahmad = uid('raffianzaiqbal695@gmail.com'), deni = uid('bacasglorya@gmail.com');
 
   type S = [string, number, number, number, string, string, string, number, number, string, string | null, number | null, string | null, number];
   // pelapor, kategori, kecamatan, desa, judul, uraian, alamat, lat, lng, status, petugas, dana, sumber, hariLalu
   const contoh = [
-    [siti.id, 1, 1, 1, 'Lubang besar di depan pasar', 'Lubang selebar satu meter di jalur motor, sudah dua pengendara jatuh minggu ini.', 'Jl. Soekarno-Hatta, depan Pasar Amahami', -8.4602, 118.7265, 'Perbaikan', ahmad.id, 12500000, 'APBD Kota', 9],
-    [rizky.id, 2, 2, 4, 'Tiga lampu jalan padam', 'Ruas jalan gelap total sejak dua minggu lalu, rawan kecelakaan malam hari.', 'Jl. Gajah Mada, Kolo', -8.4538, 118.7152, 'Survei', deni.id, null, null, 6],
-    [siti.id, 3, 1, 2, 'TPS meluap sampai badan jalan', 'Sampah belum diangkut lima hari dan mulai berbau.', 'TPS Paruga, Jl. Sultan Hasanuddin', -8.4651, 118.7312, 'Selesai', deni.id, 3200000, 'Dinas Lingkungan Hidup', 20],
-    [rizky.id, 4, 3, 7, 'Genangan setinggi lutut setelah hujan', 'Saluran tersumbat, air baru surut setelah enam jam.', 'Perumahan Oi Mbo blok C', -8.4707, 118.7421, 'Ditangani', ahmad.id, null, null, 3],
-    [siti.id, 6, 2, 5, 'Pohon angsana miring ke arah rumah', 'Akar terangkat setelah angin kencang, dahan menjorok ke kabel listrik.', 'Jl. Pelita, Nae', -8.4489, 118.7098, 'Diverifikasi', null, null, null, 2],
-    [rizky.id, 1, 3, 8, 'Aspal mengelupas sepanjang 50 meter', 'Jalan lingkungan berubah jadi kerikil lepas.', 'Jl. Lampe Raya', -8.4733, 118.7388, 'Diterima', null, null, null, 0],
-    [siti.id, 5, 1, 3, 'Area parkir gelap sering ada kehilangan motor', 'Warga minta penerangan dan patroli.', 'Parkiran Taman Kumbe', -8.4625, 118.7201, 'Ditolak', null, null, null, 14]
+    [siti.id, 1, 1, 1, 'Lubang besar di depan pasar', 'Lubang selebar satu meter di jalur motor, sudah dua pengendara jatuh minggu ini.', 'Jl. KH. Wahid Hasyim, depan Pasar Menteng', -6.1901, 106.8260, 'Perbaikan', ahmad.id, 12500000, 'APBD DKI Jakarta', 9],
+    [rizky.id, 2, 2, 4, 'Tiga lampu jalan padam', 'Ruas jalan gelap total sejak dua minggu lalu, rawan kecelakaan malam hari.', 'Jl. Danau Sunter, Kepaon', -6.1236, 106.8745, 'Survei', deni.id, null, null, 6],
+    [siti.id, 3, 1, 2, 'TPS meluap sampai badan jalan', 'Sampah belum diangkut lima hari dan mulai berbau.', 'TPS Kebon Kacang, Jl. Cikini Raya', -6.1862, 106.8300, 'Selesai', deni.id, 3200000, 'Dinas Lingkungan Hidup', 20],
+    [rizky.id, 4, 5, 13, 'Genangan setinggi lutut setelah hujan', 'Saluran tersumbat, air baru surut setelah enam jam.', 'Perumahan Babakan blok C', -6.6068, 106.8120, 'Ditangani', ahmad.id, null, null, 3],
+    [siti.id, 6, 16, 46, 'Pohon angsana miring ke arah rumah', 'Akar terangkat setelah angin kencang, dahan menjorok ke kabel listrik.', 'Jl. Radin Inten, Duren Jaya', -6.2246, 106.9936, 'Diverifikasi', null, null, null, 2],
+    [rizky.id, 1, 8, 22, 'Aspal mengelupas sepanjang 50 meter', 'Jalan lingkungan berubah jadi kerikil lepas.', 'Jl. Kalimulya Raya', -6.3833, 106.8311, 'Diterima', null, null, null, 0],
+    [siti.id, 5, 11, 31, 'Area parkir gelap sering ada kehilangan motor', 'Warga minta penerangan dan patroli.', 'Parkiran Terminal Kresek', -6.2417, 106.7263, 'Ditolak', null, null, null, 14]
   ] as unknown as S[];
 
   const urutan: Record<string, string[]> = {
@@ -82,7 +112,7 @@ export async function seedIfEmpty() {
       const t = new Date(dibuat.getTime() + i * 86400000 * Math.max(1, hari / langkah.length));
       await q(
         'INSERT INTO riwayat (laporan_id,status,catatan,oleh,peran,created_at) VALUES ($1,$2,$3,$4,$5,$6)',
-        [r!.id, langkah[i], i === 0 ? 'Laporan masuk.' : '', i === 0 ? 'Sistem' : 'Admin TANGGAP', i === 0 ? 'warga' : 'admin', t]
+        [r!.id, langkah[i], i === 0 ? 'Laporan masuk.' : '', i === 0 ? 'Sistem' : 'Zaib Akbar Rizkia', i === 0 ? 'warga' : 'admin', t]
       );
     }
   }
